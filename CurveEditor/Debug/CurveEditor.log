@@ -1,0 +1,38 @@
+﻿Build started 9/28/2013 4:36:11 PM.
+     1>Project "C:\Users\james\Documents\GitHub\CIS462_HW1\CurveEditor\CurveEditor.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\CurveEditor.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       CustomBuild:
+         All outputs are up-to-date.
+       ClCompile:
+         All outputs are up-to-date.
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.\GeneratedFiles /I.\GeneratedFiles\Debug /I..\QT\include\QtGui /I..\QT\include\QtCore /I..\QT\include\qtmain /I..\QT\include /I.\ /Zi /nologo /W1 /WX- /Od /Oy- /D UNICODE /D WIN32 /D QT_LARGEFILE_SUPPORT /D QT_CORE_LIB /D QT_GUI_LIB /D QT_DLL /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt GeneratedFiles\qrc_Resource.cpp
+         qrc_Resource.cpp
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\james\Documents\GitHub\CIS462_HW1\Debug\CurveEditor.exe" /NOLOGO /LIBPATH:..\QT\lib qtmaind.lib QtCored4.lib QtGuid4.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\CurveEditor.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\james\Documents\GitHub\CIS462_HW1\Debug\CurveEditor.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\james\Documents\GitHub\CIS462_HW1\Debug\CurveEditor.lib" /MACHINE:X86 Debug\aboutdialog.obj
+         Debug\edge.obj
+         Debug\graphicsscene.obj
+         Debug\graphwidget.obj
+         Debug\main.obj
+         Debug\mainwindow.obj
+         Debug\node.obj
+         Debug\spline.obj
+         Debug\svzalgebra.obj
+         Debug\qrc_Resource.obj
+         Debug\moc_aboutdialog.obj
+         Debug\moc_graphicsscene.obj
+         Debug\moc_graphwidget.obj
+         Debug\moc_mainwindow.obj
+         LINK : C:\Users\james\Documents\GitHub\CIS462_HW1\Debug\CurveEditor.exe not found or not built by the last incremental link; performing full link
+     1>qtmaind.lib(qtmain_win.obj) : warning LNK4099: PDB 'vc90.pdb' was not found with 'qtmaind.lib(qtmain_win.obj)' or at 'C:\Users\james\Documents\GitHub\CIS462_HW1\Debug\vc90.pdb'; linking object as if no debug info
+         CurveEditor.vcxproj -> C:\Users\james\Documents\GitHub\CIS462_HW1\Debug\CurveEditor.exe
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\james\Documents\GitHub\CIS462_HW1\Debug\CurveEditor.exe;#1" /manifest Debug\CurveEditor.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "Debug\CurveEditor.unsuccessfulbuild".
+         Touching "Debug\CurveEditor.lastbuildstate".
+     1>Done Building Project "C:\Users\james\Documents\GitHub\CIS462_HW1\CurveEditor\CurveEditor.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.58

@@ -424,6 +424,31 @@ void Spline::CalcControlPoints()
         case BezierDeCasteljau:
         case BezierMatrix:
             // ADD YOUR CODE HERE
+			// interp point 0 - start point
+			if (totalPoints == 0 || totalPoints == 1) {
+				break;
+			}
+			for (int i = 0; i  < totalPoints; i++) {
+				if (i == 0) {
+					Node* ctrl = new Node(graph,ControlPoints);
+					ctrl->setPosition((interpPoints[0]->getPosition() - startPoint->getPosition()) + interpPoints[0]->getPosition());
+					controlPoints.append(ctrl);
+				}
+				else if (i == totalPoints - 1) {
+					Node* ctrl = new Node(graph,ControlPoints);
+					ctrl->setPosition((interpPoints[totalPoints - 1]->getPosition() - endPoint->getPosition()) + interpPoints[totalPoints - 1]->getPosition());
+					controlPoints.append(ctrl);
+				}
+				else {
+					Node* ctrl2 = new Node(graph,ControlPoints);
+					ctrl2->setPosition(interpPoints[i]->getPosition() - ((interpPoints[i+1]->getPosition() - interpPoints[i-1]->getPosition()) / 4));
+					controlPoints.append(ctrl2);
+
+					Node* ctrl = new Node(graph,ControlPoints);
+					ctrl->setPosition(interpPoints[i]->getPosition() + ((interpPoints[i+1]->getPosition() - interpPoints[i-1]->getPosition()) / 4));
+					controlPoints.append(ctrl);
+				}
+			}
             break;
         case BSpline:
             // make sure there are at least 2 totalPoints.
@@ -472,7 +497,18 @@ void Spline::CalcControlPoints()
 // curvePoints.append(newNode);
 void Spline::InterpBernstein()
 {
-	// ADD YOUR CODE HERE
+	for(int i = 0; i < interpPoints.length() - 1; i ++) {
+		for( int t = 0; t < 20; t++) {
+			vec3 point = interpPoints[i]->getPosition() * bernstein(3,0,(float)t/20.f);
+			vec3 point2 = controlPoints[i*2]->getPosition() * bernstein(3,1,(float)t/20.f);
+			vec3 point3 = controlPoints[i*2 + 1]->getPosition() * bernstein(3,2,(float)t/20.f);
+			vec3 point4 = interpPoints[i+1]->getPosition() * bernstein(3,3,(float)t/20.f);
+
+			Node* newNode = new Node(graph, CurvePoints);
+			newNode->setPosition(point + point2 + point3 + point4);
+			curvePoints.append(newNode);
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -507,6 +543,23 @@ void Spline::InterpBernstein()
 void Spline::InterpCasteljau()
 {
 	// ADD YOU CODE HERE
+	for(int i = 0; i < interpPoints.length() - 1; i ++) {
+		for( int j = 0; j < 20; j++) {
+			float t = (float)j / 20.f;
+			vec3 a = interpPoints[i]->getPosition() + ((controlPoints[2*i]->getPosition() - interpPoints[i]->getPosition()) * t);
+			vec3 b = controlPoints[2*i]->getPosition() + ((controlPoints[2*i+1]->getPosition() - controlPoints[2*i]->getPosition())*t);
+			vec3 c = controlPoints[2*i+1]->getPosition() + ((interpPoints[i+1]->getPosition() - controlPoints[2*i+1]->getPosition())*t);
+
+			vec3 d = a + ((b-a)*t);
+			vec3 e = b + ((c-b)*t);
+
+			vec3 f = d + ((e-d)*t);
+
+			Node* newNode = new Node(graph, CurvePoints);
+			newNode->setPosition(f);
+			curvePoints.append(newNode);
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -549,6 +602,34 @@ void Spline::InterpCasteljau()
 void Spline::InterpMatrix()
 {
 	// ADD YOUR CODE HERE.
+	vec4 v1 = vec4(-1,3,-3,1);
+	vec4 v2 = vec4(3,-6,3,0);
+	vec4 v3 = vec4(-3,3,0,0);
+	vec4 v4 = vec4(1,0,0,0);
+	mat4 bezMatrix(v1,v2,v3,v4);
+
+	for(int i = 0; i < interpPoints.length() - 1; i ++) {
+		for( int j = 0; j < 20; j++) {
+			float t = (float)j / 20.f;
+
+			vec4 vU(t*t*t,t*t,t,1);
+
+			vec4 p1(interpPoints[i]->getPosition(),1);
+			vec4 p2(controlPoints[2*i]->getPosition(),1);
+			vec4 p3(controlPoints[2*i+1]->getPosition(),1);
+			vec4 p4(interpPoints[i+1]->getPosition(),1);
+
+			mat4 vG(p1,p2,p3,p4);
+
+			vec4 final = vU*bezMatrix*vG;
+			vec3 final3(final[0],final[1],final[2]);
+
+			Node* newNode = new Node(graph, CurvePoints);
+			newNode->setPosition(final3);
+			curvePoints.append(newNode);
+		}
+	}
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -622,4 +703,30 @@ void Spline::InterpHermiteClamped()
 void Spline::InterpHermiteNatural()
 {
 	// ADD YOUR CODE HERE.
+}
+
+float Spline::bernstein(float n, float i, float t) {
+	float a = choose(n,i);
+	float b = pow(t,i);
+	float c = pow(1-t,n-i);
+	return  a*b*c;
+}
+
+float Spline::choose(float n, float i) {
+	int a = factorial(n);
+	int b = factorial(i) * factorial(n-i);
+	return a/b;
+}
+
+float Spline::factorial(float input) {
+	int out = input;
+	if (input == 0) {
+		return 1;
+	}
+	else {
+		for (int i = input-1; i > 0; i--) {
+			out *= i;
+		}
+		return out;
+	}
 }

@@ -21,6 +21,11 @@ class GraphWidget;
 class Spline
 {
 public:
+	// My added functions
+	float factorial(float i);
+	float choose(float n, float i);
+	float bernstein(float n, float i, float t);
+	void test();
     Spline(GraphWidget *graphWidget);
 
     // Member functions
