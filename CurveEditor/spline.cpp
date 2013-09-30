@@ -456,14 +456,138 @@ void Spline::CalcControlPoints()
             break;
             // In the case for Hermite, you want to implement both "clamped" and "natural" versions.
         case HermiteClamped:
+			if (interpPoints.length() >= 2) {
+				matrix<float> m1 = createHermiteClampedMatrix1();
+				matrix<float> m2 = createHermiteClampedMatrix2();
+				matrix<float> m3 = m1.Solve(m2);
+				for (int i = 0; i < interpPoints.length(); i++) {
+					Node* ctrl = new Node(graph,ControlPoints);
+					vec3 pos(vec3(m3(i,0),m3(i,1),m3(i,2)));
+					ctrl->setPosition(pos);
+					controlPoints.append(ctrl);
+				}
+			}
             // make sure there are at least 2 totalPoints.
-            // ADD YOUR CODE HERE
+            // ADD YOUR POOP HERE
             break;
         case HermiteNatural:
-            // make sure there are at least 2 totalPoints.
-            // ADD YOUR CODE HERE
+			if (interpPoints.length() >= 2) {
+				matrix<float> m1 = createHermiteNaturalMatrix1();
+				matrix<float> m2 = createHermiteNaturalMatrix2();
+				matrix<float> m3 = m1.Solve(m2);
+				for (int i = 0; i < interpPoints.length(); i++) {
+					Node* ctrl = new Node(graph,ControlPoints);
+					vec3 pos(vec3(m3(i,0),m3(i,1),m3(i,2)));
+					ctrl->setPosition(pos);
+					controlPoints.append(ctrl);
+				}
+			}
             break;
 	}
+}
+
+matrix<float> Spline::createHermiteClampedMatrix2() {
+	int n = interpPoints.length();
+	vec3 p;
+	matrix<float> output(n,3);
+	for(int i = 0; i < n; i++) {
+		if (i == 0) {
+			p = (interpPoints[0]->getPosition() - startPoint->getPosition());
+			output(i,0) = -p[0];
+			output(i,1) = -p[1];
+			output(i,2) = -p[2];
+		}
+		else if (i == n-1) {
+			p = (endPoint->getPosition() - interpPoints[n-1]->getPosition());
+			output(i,0) = p[0];
+			output(i,1) = p[1];
+			output(i,2) = p[2];
+		}
+		else {
+			p = (3*(interpPoints[i+1]->getPosition() - interpPoints[i-1]->getPosition()));
+			output(i,0) = p[0];
+			output(i,1) = p[1];
+			output(i,2) = p[2];
+		}
+	}
+	return output;
+}
+
+matrix<float> Spline::createHermiteClampedMatrix1() {
+	int n = interpPoints.length();
+	matrix<float> output(n,n);
+	for (int i = 0; i < n; i++) {
+		for(int j = 0; j < n; j++) {
+			if (i == 0 && j == 0) {
+				output(i,j) = 1;
+			}
+			else if (i == (n-1) && j == (n-1)) {
+				output(i,j) = 1;
+			}
+			else if (i == j) {
+				output(i,j+1) = 1;
+				output(i,j) = 4;
+				output(i,j-1) = 1;
+			}
+			else {
+				output(i,j) = 0;
+			}
+		}
+	}
+	return output;
+}
+
+matrix<float> Spline::createHermiteNaturalMatrix1() {
+	int n = interpPoints.length();
+	matrix<float> output(n,n);
+	for (int i = 0; i < n; i++) {
+		for(int j = 0; j < n; j++) {
+			if (i == 0 && j == 0) {
+				output(i,j) = 2;
+				output(i,j+1) = 1;
+			}
+			else if (i == (n-1) && j == (n-1)) {
+				output(i,j) = 2;
+				output(i,j-1) = 1;
+			}
+			else if (i == j) {
+				output(i,j+1) = 1;
+				output(i,j) = 4;
+				output(i,j-1) = 1;
+			}
+			else {
+				output(i,j) = 0;
+			}
+		}
+	}
+	return output;
+}
+
+matrix<float> Spline::createHermiteNaturalMatrix2() {
+	int n = interpPoints.length();
+	vec3 p;
+	matrix<float> output(n,3);
+	for(int i = 0; i < n; i++) {
+		if (i == 0) {
+			p = (3*(interpPoints[1]->getPosition() - interpPoints[0]->getPosition()));
+			output(i,0) = p[0];
+			output(i,1) = p[1];
+			output(i,2) = p[2];
+		}
+		else if (i == n-1) {
+			p = (3*(interpPoints[n-1]->getPosition() - interpPoints[n-2]->getPosition()));
+			output(i,0) = p[0];
+			output(i,1) = p[1];
+			output(i,2) = p[2];
+		}
+		else {
+			p = (3*(interpPoints[i+1]->getPosition() - interpPoints[i-1]->getPosition()));
+			output(i,0) = p[0];
+			output(i,1) = p[1];
+			output(i,2) = p[2];
+		}
+	}
+	return output;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -561,6 +685,7 @@ void Spline::InterpCasteljau()
 		}
 	}
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Interpolation Matrix Bezier Spline
@@ -677,7 +802,33 @@ void Spline::InterpBSpline()
 //				  discription: stores all the points that form the curve, including all interpolation points
 void Spline::InterpHermiteClamped()
 {
-	// ADD YOUR CODE HERE
+	vec4 v1 = vec4(2,-2,1,1);
+	vec4 v2 = vec4(-3,3,-2,-1);
+	vec4 v3 = vec4(0,0,1,0);
+	vec4 v4 = vec4(1,0,0,0);
+	mat4 bezMatrix(v1,v2,v3,v4);
+
+	for(int i = 0; i < interpPoints.length() - 1; i ++) {
+		for( int j = 0; j < 20; j++) {
+			float t = (float)j / 20.f;
+			vec4 vU(t*t*t,t*t,t,1);
+
+			vec4 p1(interpPoints[i]->getPosition(),1);
+			vec4 p2(interpPoints[i+1]->getPosition(),1);
+			vec4 p3(controlPoints[i]->getPosition(),1);
+			vec4 p4(controlPoints[i+1]->getPosition(),1);
+
+			mat4 vG(p1,p2,p3,p4);
+
+			vec4 final = vU*bezMatrix*vG;
+			vec3 final3(final[0],final[1],final[2]);
+
+			Node* newNode = new Node(graph, CurvePoints);
+			newNode->setPosition(final3);
+			curvePoints.append(newNode);
+
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -702,7 +853,7 @@ void Spline::InterpHermiteClamped()
 // Hint: It is exactly the same like the method above.
 void Spline::InterpHermiteNatural()
 {
-	// ADD YOUR CODE HERE.
+	InterpHermiteClamped();
 }
 
 float Spline::bernstein(float n, float i, float t) {

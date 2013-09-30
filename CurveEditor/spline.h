@@ -25,7 +25,11 @@ public:
 	float factorial(float i);
 	float choose(float n, float i);
 	float bernstein(float n, float i, float t);
-	void test();
+	matrix<float> createHermiteClampedMatrix1();
+	matrix<float> createHermiteClampedMatrix2();
+	matrix<float> createHermiteNaturalMatrix1();
+	matrix<float> createHermiteNaturalMatrix2();
+
     Spline(GraphWidget *graphWidget);
 
     // Member functions
